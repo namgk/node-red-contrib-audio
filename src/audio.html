@@ -1,0 +1,73 @@
+<!--
+  Copyright 2014 Sense Tecnic Systems, Inc.
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<script type="text/x-red" data-help-name="audio">
+    <p>This node plays an audio file, either locally or from http download</p>
+</script>
+
+<script type="text/x-red" data-template-name="audio">
+  <div class="form-row">
+    <label for="node-input-name"><i class="fa fa-tag"></i> Name </label>
+    <input type="text" id="node-input-name" placeholder="A name for this node">
+  </div>
+  <div class="form-row">
+    <label for="node-input-source"><i class="icon-tag"></i>Audio source</label>
+    <input type="text" id="node-input-source" placeholder="http://...mp3 or /home/user/file.mp3">
+  </div>
+</script>
+
+
+<script type="text/javascript">
+  var color = "#f2f2f2"
+
+  RED.nodes.registerType('audio',{
+    category: 'media',
+    defaults: {
+      source: {type:'text', required:false},
+      name: {required:false}
+    },
+    color:color,
+    inputs:1,
+    outputs:0,
+    icon: "audio.jpg",
+    align: "left",
+    label: function() {
+        return this.name || "audio";
+    },
+    labelStyle: function() {
+        return this.name?"node_label_italic":"";
+    },
+    button: {
+      onclick: function() {
+        console.log('playing ' + this.source)
+        $.ajax({
+          url: "audio/"+this.id,
+          type:"POST",
+          success: function(resp) {
+            RED.notify("Player triggered","success");
+          },
+          error: function(jqXHR,textStatus,errorThrown) {
+            if (jqXHR.status == 404) {
+                RED.notify("Node not deployed","error");
+            } else {
+                RED.notify('Status: ' + jqXHR.status + ', ' + textStatus,"error");
+            }
+          }
+        });
+      }
+    }
+  });
+</script>
