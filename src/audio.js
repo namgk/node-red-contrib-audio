@@ -32,19 +32,6 @@ module.exports = function(RED) {
 
     node.source = n.source;
 
-    node.decoder = new lame.Decoder()
-    node.speaker = new Speaker()
-
-    node.speaker.on('close', function(){
-      node.playing = false
-    })
-
-    node.speaker.on('open', function(){
-      node.playing = true
-    })
-
-    node.decoder.pipe(node.speaker)
-
     node.on('close', function(){
       if (node.request){
         node.request.abort()
@@ -63,11 +50,13 @@ module.exports = function(RED) {
         msg.payload = {}
       }
 
+      var source = node.source
+
       if (typeof msg.payload === 'string'){
-        node.source = msg.payload
+        source = msg.payload
       }
 
-      if (!node.source){
+      if (!source){
         node.error('No audio source specified')
         return
       }
@@ -77,15 +66,27 @@ module.exports = function(RED) {
         return
       }
 
-      if (utils.isLocalFile(node.source)){
-        fs.createReadStream(node.source)
+      node.decoder = new lame.Decoder()
+      node.speaker = new Speaker()
+      node.decoder.pipe(node.speaker)
+
+      node.speaker.on('close', function(){
+        node.playing = false
+      })
+
+      node.speaker.on('open', function(){
+        node.playing = true
+      })
+
+      if (utils.isLocalFile(source)){
+        fs.createReadStream(source)
         .on('error', function(){
-          node.error('Audio source not readable nor found: '+ node.source)
+          node.error('Audio source not readable nor found: '+ source)
         })
         .pipe(node.decoder)
       } else {
-        node.request = (node.source.startsWith('https://') ? https : http)
-        .get(node.source, function(response) {
+        node.request = (source.startsWith('https://') ? https : http)
+        .get(source, function(response) {
           response.pipe(node.decoder)
         }).on('error', function(e) {
           node.error("Streaming error: " + e.message);
