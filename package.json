@@ -13,7 +13,8 @@
     "audio",
     "mp3",
     "speaker",
-    "streaming"
+    "streaming",
+    "node-red"
   ],
   "author": "Nam Giang",
   "license": "ISC",
