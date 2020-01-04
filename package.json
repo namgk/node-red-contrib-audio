@@ -23,8 +23,8 @@
   },
   "homepage": "https://github.com/namgk/node-red-contrib-audio#readme",
   "dependencies": {
-    "lame": "^1.2.4",
-    "speaker": "^0.3.0"
+    "lame": "git+https://github.com/suldashi/node-lame.git",
+    "speaker": "^0.5.1"
   },
   "node-red": {
     "nodes": {
